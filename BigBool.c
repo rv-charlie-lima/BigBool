@@ -4,24 +4,17 @@
 #include "BigBool.h"
 
 BigBool* BigBool_from_str(char* vecStr) {
-    if(!vecStr) {
-        printf("empty string passed\n");
+    if(!vecStr)
         return NULL;
-    }
 
     BigBool* BB = calloc(1, sizeof(BigBool));
-    if(!BB) {
-        printf("memory allocation error\n");
+    if(!BB)
         return NULL;
-    }
 
     int vecLen = strlen(vecStr);
-    for(int i = 0; i < vecLen; ++i) {
-        if(vecStr[i] != '0' && vecStr[i] != '1') {
-            printf("invalid argument passed\n");
+    for(int i = 0; i < vecLen; ++i)
+        if(vecStr[i] != '0' && vecStr[i] != '1')
             return NULL;
-        }
-    }
 
     BB->num_part = vecLen / 8;
     BB->num_bit = vecLen % 8;
@@ -64,18 +57,14 @@ BigBool* BigBool_from_uint64(uint64_t num) {
 
 char* BigBool_to_str(BigBool* BB) {
 
-    if(!BB) {
-        printf("null argument passed\n");
+    if(!BB)
         return NULL;
-    }
 
     size_t vecLen = BigBool_len(BB);
     char *vecStr = (char*)malloc(vecLen + 1);
     
-    if(!vecStr) {
-        printf("memory allocation error\n");
+    if(!vecStr)
         return NULL;
-    }
 
     for(int bit = vecLen - 1; bit >= 0; --bit) {
         vecStr[vecLen - bit - 1] = BB->vector[bit / 8] >> (bit % 8) & 1;
@@ -88,10 +77,8 @@ char* BigBool_to_str(BigBool* BB) {
 
 void inversion(BigBool* BB) {
     
-    if(!BB) {
-        printf("null argument passed\n");
+    if(!BB)
         return;
-    }
 
 
     uint8_t mask = 0b11111111;
@@ -107,16 +94,12 @@ void inversion(BigBool* BB) {
 }
 
 BigBool* conjunction(BigBool* BB1, BigBool* BB2) {
-    if(!BB1 || !BB2) {
-        printf("null argument passed\n");
+    if(!BB1 || !BB2)
         return NULL;        
-    }
 
     BigBool* res = calloc(1, sizeof(BigBool));
-    if(!res) {
-        printf("memory allocation error\n");
+    if(!res)
         return NULL;        
-    }
 
     if(BigBool_len(BB1) < BigBool_len(BB2)) {
         res = conjunction(BB2, BB1);
@@ -136,16 +119,12 @@ BigBool* conjunction(BigBool* BB1, BigBool* BB2) {
 
 BigBool* disjunction(BigBool* BB1, BigBool* BB2) {
     
-    if(!BB1 || !BB2) {
-        printf("null argument passed\n");
+    if(!BB1 || !BB2)
         return NULL;        
-    }
 
     BigBool* res = calloc(1, sizeof(BigBool));
-    if(!res) {
-        printf("memory allocation error\n");
-        return NULL;        
-    }    
+    if(!res) 
+        return NULL;      
 
 
     if(BigBool_len(BB1) < BigBool_len(BB2)) {
@@ -167,16 +146,12 @@ BigBool* disjunction(BigBool* BB1, BigBool* BB2) {
 
 BigBool* xor(BigBool* BB1, BigBool* BB2) {
     
-    if(!BB1 || !BB2) {
-        printf("null argument passed\n");
+    if(!BB1 || !BB2)
         return NULL;        
-    }
 
     BigBool* res = calloc(1, sizeof(BigBool));
-    if(!res) {
-        printf("memory allocation error\n");
+    if(!res)
         return NULL;        
-    }
 
     if(BigBool_len(BB1) < BigBool_len(BB2)) {
         res = xor(BB2, BB1);
@@ -195,17 +170,13 @@ BigBool* xor(BigBool* BB1, BigBool* BB2) {
 
 void left_shift(BigBool* BB, int shift) {
     
-    if(!BB) {
-        printf("null argument passed\n");
+    if(!BB) 
         return;
-    }
     
     int parts = BB->num_part + (BB->num_bit > 0);
     uint8_t* res = calloc(1, parts * sizeof(uint8_t));
-    if(!res) {
-        printf("memory allocation error\n");
+    if(!res) 
         return;        
-    }
 
     if(shift >= MAX_PARTS * 8) {
         return;
@@ -238,17 +209,13 @@ void left_shift(BigBool* BB, int shift) {
 
 void right_shift(BigBool* BB, int shift) {
     
-    if(!BB) {
-        printf("null argument passed\n");
+    if(!BB) 
         return;
-    }
 
     int parts = BB->num_part + (BB->num_bit > 0);
     uint8_t* res = calloc(1, parts * sizeof(uint8_t));
-    if(!res) {
-        printf("memory allocation error\n");
+    if(!res) 
         return;        
-    }
 
     if(shift >= MAX_PARTS * 8) {
         return;
@@ -273,10 +240,9 @@ void right_shift(BigBool* BB, int shift) {
 }
 
 void left_circular_shift(BigBool* BB, int shift) {
-    if(!BB) {
-        printf("null argument passed\n");
+    if(!BB) 
         return;
-    }
+
     if(shift < 0) {
         right_circular_shift(BB, -shift);
         return;
@@ -284,9 +250,8 @@ void left_circular_shift(BigBool* BB, int shift) {
 
     int parts = BB->num_part + (BB->num_bit > 0);
     uint8_t* res = calloc(1, parts * sizeof(uint8_t));
-    if(!res) {
-        printf("memory allocation error\n");
-    }
+    if(!res)
+        return;
 
     int vecLen = BigBool_len(BB); 
     shift %= vecLen;
@@ -300,22 +265,13 @@ void left_circular_shift(BigBool* BB, int shift) {
     memcpy(BB->vector, res, parts);
     free(res);
 
-    // for(int pos = vecLen - 1; pos > 0; --pos) {
-    //     bit1 = get_bit(BB, pos);
-    //     shiftPos = (vecLen - shift + pos) % vecLen;
-    //     bit2 = get_bit(BB, shiftPos);
-    //     set_bit(BB, bit1, shiftPos);
-    //     set_bit(BB, bit2, pos);
-    // }
-
     return;
 }
 
 void right_circular_shift(BigBool* BB, int shift) {
-    if(!BB) {
-        printf("null argument passed\n");
+    if(!BB) 
         return;
-    }
+
     if(shift < 0) {
         left_circular_shift(BB, -shift);
         return;
@@ -323,9 +279,8 @@ void right_circular_shift(BigBool* BB, int shift) {
     
     int parts = BB->num_part + (BB->num_bit > 0);
     uint8_t* res = calloc(1, parts * sizeof(uint8_t));
-    if(!res) {
-        printf("memory allocation error\n");
-    }
+    if(!res) 
+        return;
 
     int vecLen = BigBool_len(BB); 
     shift %= vecLen;
@@ -348,10 +303,8 @@ size_t BigBool_len(BigBool* BB) {
 
 void leading_zeros_remove(BigBool* BB) {
     
-    if(!BB) {
-        printf("null argument passed\n");
+    if(!BB) 
         return;
-    }
 
     int parts = sizeof(BB->vector);
     while(parts > 0 && BB->vector[parts - 1] == 0 ) {
@@ -379,18 +332,14 @@ void leading_zeros_remove(BigBool* BB) {
 }
 
 void set_bit(BigBool* BB, int bit, int pos) {
-    if(!BB) {
-        printf("null argument passed\n");
+    if(!BB) 
         return;
-    }
-    if(pos > BigBool_len(BB)) {
-        printf("invalid argument passed\n");
+
+    if(pos > BigBool_len(BB))
         return;
-    }
-    if(bit != 0 && bit != 1) {
-        printf("invalid argument passed\n");
+
+    if(bit != 0 && bit != 1) 
         return;        
-    }
 
     uint8_t mask = 0b11111111;
     mask ^= 1 << (pos % 8);
@@ -400,13 +349,11 @@ void set_bit(BigBool* BB, int bit, int pos) {
 }
 
 int get_bit(BigBool* BB, int pos) {
-    if(!BB) {
-        printf("null argument passed\n");
+    if(!BB) 
         return -1;
-    }
-    if(pos > BigBool_len(BB)) {
-        printf("invalid argument passed\n");
+    
+    if(pos > BigBool_len(BB))
         return -1;
-    }
+    
     return BB->vector[pos / 8] >> (pos % 8) & 1;
 }
